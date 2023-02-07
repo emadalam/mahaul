@@ -6,14 +6,14 @@
 [![github.com](https://img.shields.io/github/last-commit/emadalam/mahaul.svg)](https://github.com/emadalam/mahaul)
 
 
-Parse and validate your environment variables easily in Elixir with the following benefits. [See more](#why-this-package) for understanding why to use this package.
+Parse and validate your environment variables easily in Elixir with the following benefits.
 
 * Compile time access guarantees
 * Parsed values with accurate elixir data types
 * Validation of required values before app boot
 * `mix` environment specific defaults and fallbacks
 
-The complete documentation for `mahaul` is [available online at HexDocs](https://hexdocs.pm/mahaul).
+[Read more](#why-this-package) for understanding why to use this package and its benefits. The complete documentation for `mahaul` is [available online at HexDocs](https://hexdocs.pm/mahaul).
 
 ## Requirements
 
@@ -40,7 +40,7 @@ end
 ```elixir
 defmodule MyApp.Env do
   use Mahaul,
-    PORT: [type: :port, default_dev: "4000"]
+    PORT: [type: :port, default_dev: "4000"],
     DEPLOYMENT_ENV: [type: :enum, choices: [:dev, :staging, :live], default_dev: "dev"],
     DATABASE_URL: [type: :uri, default_dev: "postgresql://user:pass@localhost:5432/app_dev"],
     ANOTHER_ENV: [type: :host, default: "192.168.0.1"]
