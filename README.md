@@ -1,9 +1,7 @@
 # Mahaul
 
 [![hex.pm](https://img.shields.io/hexpm/v/mahaul.svg)](https://hex.pm/packages/mahaul)
-[![hex.pm](https://img.shields.io/hexpm/dt/mahaul.svg)](https://hex.pm/packages/mahaul)
 [![hex.pm](https://img.shields.io/hexpm/l/mahaul.svg)](https://hex.pm/packages/mahaul)
-[![github.com](https://img.shields.io/github/last-commit/emadalam/mahaul.svg)](https://github.com/emadalam/mahaul)
 
 
 Parse and validate your environment variables easily in Elixir with the following benefits.
