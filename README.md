@@ -26,12 +26,18 @@ Elixir 1.13+
 ```elixir
 def deps do
   [
-    {:mahaul, "~> 0.1.0"}
+    {:mahaul, "~> 0.2.0"}
   ]
 end
 ```
 
 - Run `mix deps.get`
+
+- Add config in your `config/config.exs` file
+
+```elixir
+config :mahaul, mix_env: Mix.env()
+```
 
 ## Getting started
 
@@ -43,7 +49,7 @@ defmodule MyApp.Env do
     PORT: [type: :port, default_dev: "4000"],
     DEPLOYMENT_ENV: [type: :enum, choices: [:dev, :staging, :live], default_dev: "dev"],
     DATABASE_URL: [type: :uri, default_dev: "postgresql://user:pass@localhost:5432/app_dev"],
-    ANOTHER_ENV: [type: :host, default: "192.168.0.1"]
+    ANOTHER_ENV: [type: :host, default: "//localhost"]
 end
 ```
 

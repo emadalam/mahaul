@@ -11,7 +11,6 @@ defmodule Mahaul.Helpers do
   @type parsed_vars_type :: list
   @type config_type :: keyword
 
-  @env Mix.env()
   @error_tuple {:error, nil}
 
   @spec validate!(parsed_vars_type) :: nil
@@ -74,7 +73,7 @@ defmodule Mahaul.Helpers do
     if is_nil(env_val), do: @error_tuple, else: parse(env_val, env_type)
   end
 
-  defp get_env_val_or_default(env_val, config, mix_env \\ @env)
+  defp get_env_val_or_default(env_val, config, mix_env \\ get_mix_env())
 
   defp get_env_val_or_default(env_val, config, mix_env) when mix_env in [:dev, :test] do
     env_val || Keyword.get(config, :default_dev) || Keyword.get(config, :default)
@@ -83,6 +82,8 @@ defmodule Mahaul.Helpers do
   defp get_env_val_or_default(env_val, config, _mix_env) do
     env_val || Keyword.get(config, :default)
   end
+
+  defp get_mix_env(), do: Application.get_env(:mahaul, :mix_env, :prod)
 
   @doc ~S"""
 
