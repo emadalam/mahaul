@@ -85,7 +85,7 @@ defmodule Mahaul.Helpers do
     env_val || Keyword.get(config, :default)
   end
 
-  defp get_mix_env(), do: Application.get_env(:mahaul, :mix_env, :prod)
+  defp get_mix_env, do: Application.get_env(:mahaul, :mix_env, :prod)
 
   @doc ~S"""
 
