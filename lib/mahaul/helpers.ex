@@ -12,6 +12,8 @@ defmodule Mahaul.Helpers do
   @type config_type :: keyword
 
   @error_tuple {:error, nil}
+  @supported_types [:str, :enum, :num, :int, :bool, :port, :host, :uri]
+  @required_opts [:type]
 
   @spec validate!(parsed_vars_type) :: nil
   def validate!(parsed_envs) do
@@ -256,4 +258,62 @@ defmodule Mahaul.Helpers do
   end
 
   def parse(_val, _type), do: @error_tuple
+
+  @spec validate_opts!(keyword()) :: :ok
+  def validate_opts!(opts) do
+    validate_keyword!(opts)
+
+    Enum.each(opts, fn {env_var, opt} ->
+      validate_keyword!(opt, env_var)
+      validate_required_opt!(opt, env_var)
+      Enum.each(opt, &validate_opt!(&1, env_var))
+    end)
+  end
+
+  defp validate_required_opt!(opt, name) do
+    missing_opts = @required_opts -- Keyword.keys(opt)
+
+    unless missing_opts == [] do
+      raise ArgumentError, "#{name}: missing required options #{inspect(missing_opts)}"
+    end
+  end
+
+  defp validate_opt!({:type, type}, name) do
+    unless type in @supported_types do
+      raise ArgumentError,
+            "#{name}: expected :type to be one of #{inspect(@supported_types)}, got: #{inspect(type)}"
+    end
+  end
+
+  defp validate_opt!({:choices, choices}, name) do
+    unless is_list(choices) and not Enum.empty?(choices) do
+      raise ArgumentError,
+            "#{name}: expected :choices to be a non-empty list, got: #{inspect(choices)}"
+    end
+  end
+
+  defp validate_opt!({:default, default}, name) do
+    unless is_binary(default) do
+      raise ArgumentError,
+            "#{name}: expected :default to be a string, got: #{inspect(default)}"
+    end
+  end
+
+  defp validate_opt!({:default_dev, default_dev}, name) do
+    unless is_binary(default_dev) do
+      raise ArgumentError,
+            "#{name}: expected :default_dev to be a string, got: #{inspect(default_dev)}"
+    end
+  end
+
+  defp validate_opt!(option, name) do
+    raise ArgumentError, "#{name}: unknown option provided #{inspect(option)}"
+  end
+
+  defp validate_keyword!(opts, name \\ "Mahaul") do
+    unless Keyword.keyword?(opts) and not Enum.empty?(opts) do
+      raise ArgumentError,
+            "#{name}: expected options to be a non-empty keyword list, got: #{inspect(opts)}"
+    end
+  end
 end
