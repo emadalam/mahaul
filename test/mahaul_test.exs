@@ -22,6 +22,38 @@ defmodule MahaulTest do
     end)
   end
 
+  describe "invalid options" do
+    invalid_opts_samples = [
+      {"Mahaul: expected options to be a non-empty keyword list, got: []", []},
+      {"MOCK__ENV: expected options to be a non-empty keyword list, got: true",
+       [MOCK__ENV: true]},
+      {"MOCK__ENV: expected options to be a non-empty keyword list, got: []", [MOCK__ENV: []]},
+      {"MOCK__ENV: expected :type to be one of [:str, :enum, :num, :int, :bool, :port, :host, :uri], got: :invalid",
+       [MOCK__ENV: [type: :invalid]]},
+      {"MOCK__ENV: missing required options [:type]", [MOCK__ENV: [default: "__MOCK__"]]},
+      {"MOCK__ENV: expected :choices to be a non-empty list, got: true",
+       [MOCK__ENV: [type: :str, choices: true]]},
+      {"MOCK__ENV: expected :choices to be a non-empty list, got: []",
+       [MOCK__ENV: [type: :str, choices: []]]},
+      {"MOCK__ENV: expected :default to be a string, got: 1000",
+       [MOCK__ENV: [type: :str, default: 1000]]},
+      {"MOCK__ENV: expected :default_dev to be a string, got: false",
+       [MOCK__ENV: [type: :str, default_dev: false]]},
+      {"MOCK__ENV: unknown option provided {:invalid_option, \"__MOCK__\"}",
+       [MOCK__ENV: [type: :str, invalid_option: "__MOCK__"]]}
+    ]
+
+    for {{error, opts}, index} <- invalid_opts_samples |> Enum.with_index() do
+      test "should raise exception for invalid options #{inspect(opts)}" do
+        assert_raise ArgumentError, unquote(error), fn ->
+          defmodule String.to_atom("Env0.#{unquote(index)}") do
+            use Mahaul, unquote(opts)
+          end
+        end
+      end
+    end
+  end
+
   describe "validate/0" do
     test "should return success for valid environment variables" do
       defmodule Env1 do

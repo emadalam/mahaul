@@ -13,6 +13,11 @@ defmodule Mahaul do
       require Logger
       alias Mahaul.Helpers
 
+      @after_compile Mahaul
+
+      @doc false
+      def __opts__, do: unquote(opts)
+
       Enum.each(opts, fn {key, val} ->
         str_key = Atom.to_string(key)
         fn_name = str_key |> String.downcase() |> String.to_atom()
@@ -42,5 +47,12 @@ defmodule Mahaul do
         Helpers.validate(Helpers.parse_all(unquote(opts)))
       end
     end
+  end
+
+  alias Mahaul.Helpers
+
+  @doc false
+  defmacro __after_compile__(%{module: module}, _env) do
+    Helpers.validate_opts!(module.__opts__())
   end
 end
