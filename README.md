@@ -182,7 +182,7 @@ You can further restrict the parsed values to a predefined list by setting the `
 defmodule MyApp.Env do
   use Mahaul,
     DEPLOYMENT_ENV: [type: :enum, choices: [:dev, :staging, :live]],
-    DAY_OF_WEEK: [type: :int, choices: [1, 2, 3, 4, 5, 6, 7]
+    DAY_OF_WEEK: [type: :int, choices: [1, 2, 3, 4, 5, 6, 7]]
 end
 ```
 
