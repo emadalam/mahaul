@@ -52,7 +52,7 @@ defmodule Mahaul.MixProject do
     [
       "test.ci": [
         "format --check-formatted",
-        "credo",
+        "credo --strict",
         "test --cover --export-coverage=test-coverage",
         "test.coverage"
       ]
