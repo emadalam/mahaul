@@ -27,7 +27,11 @@ defmodule Mahaul.MixProject do
       preferred_cli_env: [
         docs: :docs,
         "hex.publish": :docs,
-        "test.ci": :test
+        "lint.code": :test,
+        coveralls: :test,
+        "coveralls.detail": :test,
+        "coveralls.post": :test,
+        "coveralls.html": :test
       ]
     ]
   end
@@ -44,24 +48,24 @@ defmodule Mahaul.MixProject do
   defp deps do
     [
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
-      {:ex_doc, "~> 0.27", only: :docs, runtime: false}
+      {:ex_doc, "~> 0.27", only: :docs, runtime: false},
+      {:excoveralls, "~> 0.15.3", only: :test}
     ]
   end
 
   defp aliases do
     [
-      "test.ci": [
+      "lint.code": [
         "format --check-formatted",
-        "credo --strict",
-        "test --cover --export-coverage=test-coverage",
-        "test.coverage"
+        "credo --strict"
       ]
     ]
   end
 
   defp test_coverage do
     [
-      summary: [threshold: 90]
+      tool: ExCoveralls,
+      export: "cov"
     ]
   end
 

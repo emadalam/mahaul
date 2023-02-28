@@ -66,5 +66,10 @@ jobs:
     - name: Compiles without warnings
       run: mix compile --warnings-as-errors
 
+    - name: Lint code
+      run: mix lint.code
+
     - name: Run tests
-      run: mix test.ci
+      run: mix coveralls.github
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
