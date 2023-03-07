@@ -77,12 +77,20 @@ defmodule Mahaul.Helpers do
 
   defp get_env_val_or_default(env_val, config, mix_env \\ get_mix_env())
 
-  defp get_env_val_or_default(env_val, config, mix_env) when mix_env in [:dev, :test] do
-    env_val || Keyword.get(config, :default_dev) || Keyword.get(config, :default)
-  end
+  defp get_env_val_or_default(env_val, config, mix_env) do
+    # simplify this once we remove support for `:default_dev` option
+    # in favour of the `:defaults` option
+    if Keyword.has_key?(config, :default_dev) do
+      case mix_env do
+        env when env in [:dev, :test] ->
+          env_val || Keyword.get(config, :default_dev) || Keyword.get(config, :default)
 
-  defp get_env_val_or_default(env_val, config, _mix_env) do
-    env_val || Keyword.get(config, :default)
+        _ ->
+          env_val || Keyword.get(config, :default)
+      end
+    else
+      env_val || config[:defaults][mix_env] || Keyword.get(config, :default)
+    end
   end
 
   defp get_mix_env, do: Application.get_env(:mahaul, :mix_env, :prod)
@@ -300,20 +308,29 @@ defmodule Mahaul.Helpers do
   end
 
   defp validate_opt!({:default_dev, default_dev}, name) do
+    IO.warn(
+      ~s(#{name}: :default_dev option is deprecated, use :defaults instead. eg: defaults: [prod: "MY_VAL1", dev: "MY_VAL2", test: "MY_VAL3"]),
+      Macro.Env.stacktrace(__ENV__)
+    )
+
     unless is_binary(default_dev) do
       raise ArgumentError,
             "#{name}: expected :default_dev to be a string, got: #{inspect(default_dev)}"
     end
   end
 
+  defp validate_opt!({:defaults, defaults}, name) do
+    validate_keyword!(defaults, name, ":defaults")
+  end
+
   defp validate_opt!(option, name) do
     raise ArgumentError, "#{name}: unknown option provided #{inspect(option)}"
   end
 
-  defp validate_keyword!(opts, name \\ "Mahaul") do
+  defp validate_keyword!(opts, name \\ "Mahaul", opt_name \\ "options") do
     unless Keyword.keyword?(opts) and not Enum.empty?(opts) do
       raise ArgumentError,
-            "#{name}: expected options to be a non-empty keyword list, got: #{inspect(opts)}"
+            "#{name}: expected #{opt_name} to be a non-empty keyword list, got: #{inspect(opts)}"
     end
   end
 end
