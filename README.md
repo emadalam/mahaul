@@ -45,9 +45,13 @@ config :mahaul, mix_env: Mix.env()
 ```elixir
 defmodule MyApp.Env do
   use Mahaul,
-    PORT: [type: :port, default_dev: "4000"],
-    DEPLOYMENT_ENV: [type: :enum, choices: [:dev, :staging, :live], default_dev: "dev"],
-    DATABASE_URL: [type: :uri, default_dev: "postgresql://user:pass@localhost:5432/app_dev"],
+    DEPLOYMENT_ENV: [
+      type: :enum,
+      defaults: [dev: "dev", test: "dev"],
+      choices: [:dev, :staging, :live]
+    ],
+    PORT: [type: :port, defaults: [dev: "4000"]],
+    DATABASE_URL: [type: :uri, defaults: [dev: "postgresql://user:pass@localhost:5432/app_dev"]],
     ANOTHER_ENV: [type: :host, default: "//localhost"]
 end
 ```
@@ -108,7 +112,7 @@ The following type configurations are supported.
 
 ## Setting Defaults
 
-Any defaults and fallback values can be set globally using the `default` or for development environment using the `default_dev` configuration options. Make sure to use the string values same as we set in the actual system environment, as it will be parsed depending upon the provided `type` configuration.
+Any defaults and fallback values can be set globally using the `default` or for any mix environment using the `defaults` configuration options. Make sure to use the string values same as we set in the actual system environment, as it will be parsed depending upon the provided `type` configuration.
 
 #### Globally
 
@@ -129,48 +133,71 @@ iex> MyApp.Env.my_env()
 Hello Universe
 ```
 
-#### For dev/test environment
+#### For any mix environment
 
 ```elixir
 defmodule MyApp.Env do
   use Mahaul,
-    MY_ENV: [type: :str, dev_default: "Hello Dev"]
+    MY_ENV: [
+      type: :str,
+      defaults: [prod: "Hello Prod", dev: "Hello Dev", test: "Hello Test", custom: "Hello Custom"]
+    ]
 end
 ```
 
 ```
-MIX_ENV=dev iex -S mix
-iex> MyApp.Env.my_env()
-Hello Dev
-
-MIX_ENV=dev MY_ENV="Hello World" iex -S mix
-iex> MyApp.Env.my_env()
-Hello World
-```
-
-#### Globally with dev/test environment overrides
-
-```elixir
-defmodule MyApp.Env do
-  use Mahaul,
-    MY_ENV: [type: :str, default: "Hello World", dev_default: "Hello Dev"]
-end
-```
-
-```
-MIX_ENV=dev iex -S mix
-iex> MyApp.Env.my_env()
-Hello Dev
-
-MIX_ENV=dev MY_ENV="Hello Universe" iex -S mix
-iex> MyApp.Env.my_env()
-Hello Universe
-
 MIX_ENV=prod iex -S mix
 iex> MyApp.Env.my_env()
+Hello Prod
+
+MIX_ENV=dev iex -S mix
+iex> MyApp.Env.my_env()
+Hello Dev
+
+MIX_ENV=test iex -S mix
+iex> MyApp.Env.my_env()
+Hello Test
+
+MIX_ENV=custom iex -S mix
+iex> MyApp.Env.my_env()
+Hello Custom
+
+MIX_ENV=prod MY_ENV="Hello World" iex -S mix
+iex> MyApp.Env.my_env()
+Hello World
+```
+
+#### For any mix environment with fallback
+
+```elixir
+defmodule MyApp.Env do
+  use Mahaul,
+    MY_ENV: [
+      type: :str,
+      default: "Hello World",
+      defaults: [prod: "Hello Prod", dev: "Hello Dev", test: "Hello Test"]
+    ]
+end
+```
+
+```
+MIX_ENV=prod iex -S mix
+iex> MyApp.Env.my_env()
+Hello Prod
+
+MIX_ENV=dev iex -S mix
+iex> MyApp.Env.my_env()
+Hello Dev
+
+MIX_ENV=test iex -S mix
+iex> MyApp.Env.my_env()
+Hello Test
+
+MIX_ENV=custom iex -S mix
+iex> MyApp.Env.my_env()
 Hello World
 
-MIX_ENV=prod MY_ENV="Hello Universe" iex -S mix
+MIX_ENV=custom MY_ENV="Hello Universe" iex -S mix
 iex> MyApp.Env.my_env()
 Hello Universe
 ```
@@ -220,6 +247,9 @@ git clone https://github.com/emadalam/mahaul.git
 cd mahaul
 mix deps.get
 mix test
+
+# or with coverage threshold
+# mix coveralls
 ```
 
 ### Building docs
