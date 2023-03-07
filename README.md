@@ -112,7 +112,7 @@ The following type configurations are supported.
 
 ## Setting Defaults
 
-Any defaults and fallback values can be set globally using the `default` or for any mix environment using the `defaults` configuration options. Make sure to use the string values same as we set in the actual system environment, as it will be parsed depending upon the provided `type` configuration.
+Any defaults and fallback values can be set globally using the `default` or for any mix environment using the `defaults` configuration options. Make sure to **use the string values** same as we set in the actual system environment, as it will be parsed depending upon the provided `type` configuration.
 
 #### Globally
 

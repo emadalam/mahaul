@@ -321,6 +321,13 @@ defmodule Mahaul.Helpers do
 
   defp validate_opt!({:defaults, defaults}, name) do
     validate_keyword!(defaults, name, ":defaults")
+
+    Enum.each(defaults, fn {key, val} ->
+      unless is_binary(val) do
+        raise ArgumentError,
+              "#{name}: expected :defaults :#{key} to be a string, got: #{inspect(val)}"
+      end
+    end)
   end
 
   defp validate_opt!(option, name) do

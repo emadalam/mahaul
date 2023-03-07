@@ -38,6 +38,8 @@ defmodule MahaulTest do
        [MOCK__ENV: [type: :str, choices: []]]},
       {"MOCK__ENV: expected :defaults to be a non-empty keyword list, got: []",
        [MOCK__ENV: [type: :str, defaults: []]]},
+      {"MOCK__ENV: expected :defaults :dev to be a string, got: 1000",
+       [MOCK__ENV: [type: :str, defaults: [dev: 1000]]]},
       {"MOCK__ENV: expected :default to be a string, got: 1000",
        [MOCK__ENV: [type: :str, default: 1000]]},
       {"MOCK__ENV: expected :default_dev to be a string, got: false",
