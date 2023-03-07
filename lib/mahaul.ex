@@ -2,7 +2,7 @@ defmodule Mahaul do
   @external_resource "README.md"
   @moduledoc File.read!("README.md") |> String.replace("# Mahaul\n\n", "", global: false)
 
-  @version "0.4.0"
+  @version "0.4.1"
 
   @doc false
   def version, do: @version
