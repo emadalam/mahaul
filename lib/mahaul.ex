@@ -23,7 +23,7 @@ defmodule Mahaul do
         fn_name = str_key |> String.downcase() |> String.to_atom()
 
         def unquote(fn_name)() do
-          elem(Helpers.get_env(unquote(key), unquote(val)), 1)
+          Helpers.get_env(unquote(key), unquote(val))
         end
       end)
 
