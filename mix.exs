@@ -2,7 +2,7 @@ defmodule Mahaul.MixProject do
   use Mix.Project
 
   @source_url "https://github.com/emadalam/mahaul"
-  @version "0.4.1"
+  @version "0.5.0"
 
   def project do
     [
