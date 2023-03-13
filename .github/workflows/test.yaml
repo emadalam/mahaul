@@ -22,6 +22,7 @@ jobs:
         elixir: ['1.13']
     steps:
     - name: Set up Elixir
+      id: beam
       uses: erlef/setup-beam@v1
       with:
         otp-version: ${{matrix.otp}}
@@ -53,6 +54,18 @@ jobs:
           ${{ runner.os }}-mix-${{ env.cache-name }}-
           ${{ runner.os }}-mix-
 
+    - name: Restore PLT cache
+      id: plt-cache
+      uses: actions/cache@v3
+      env:
+        cache-name: cache-plt
+      with:
+        path: priv/plts
+        key: |
+          ${{ runner.os }}-plt-${{ env.cache-name }}-${{ steps.beam.outputs.elixir-version }}-${{ steps.beam.outputs.otp-version }}
+        restore-keys: |
+          ${{ runner.os }}-plt-${{ env.cache-name }}-${{ steps.beam.outputs.elixir-version }}-${{ steps.beam.outputs.otp-version }}
+
     - name: Clean to rule out incremental build as a source of flakiness
       if: github.run_attempt != '1'
       run: |
@@ -66,8 +79,15 @@ jobs:
     - name: Compiles without warnings
       run: mix compile --warnings-as-errors
 
+    - name: Create PLTs
+      if: steps.plt_cache.outputs.cache-hit != 'true'
+      run: mix dialyzer --plt
+
     - name: Lint code
       run: mix lint.code
+
+    - name: Run dialyzer
+      run: mix dialyzer --format github
 
     - name: Run tests
       run: mix coveralls.github

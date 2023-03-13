@@ -29,3 +29,5 @@ mahaul-*.tar
 .elixir_ls/
 .DS_Store
 .vscode
+/priv/plts/*.plt
+/priv/plts/*.plt.hash
