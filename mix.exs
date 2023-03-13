@@ -14,6 +14,9 @@ defmodule Mahaul.MixProject do
       deps: deps(),
       aliases: aliases(),
       test_coverage: test_coverage(),
+      dialyzer: [
+        plt_file: {:no_warn, "priv/plts/dialyzer.plt"}
+      ],
 
       # Hex
       description: description(),
@@ -47,6 +50,8 @@ defmodule Mahaul.MixProject do
 
   defp deps do
     [
+      {:git_hooks, "~> 0.7", only: [:dev], runtime: false},
+      {:dialyxir, "~> 1.1", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.27", only: :docs, runtime: false},
       {:excoveralls, "~> 0.15.3", only: :test}
