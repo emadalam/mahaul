@@ -25,7 +25,7 @@ Elixir 1.13+
 ```elixir
 def deps do
   [
-    {:mahaul, "~> 0.4.1"}
+    {:mahaul, "~> 0.5.0"}
   ]
 end
 ```
