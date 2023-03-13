@@ -236,16 +236,21 @@ You can [set default values](#setting-defaults) for the production or developmen
 
 ## Contributing
 
-Contributions are welcome
+Contributions are welcome. Please follow the commit guidelines from https://www.conventionalcommits.org.
 
-### Running tests
+### Setup
 
 Clone the repo and fetch its dependencies:
 
 ```sh
 git clone https://github.com/emadalam/mahaul.git
 cd mahaul
-mix deps.get
+mix setup
+```
+
+### Running tests
+
+```sh
 mix test
 
 # or with coverage threshold
@@ -256,6 +261,9 @@ mix test
 
 ```sh
 MIX_ENV=docs mix docs
+
+# or view the docs
+# MIX_ENV=docs mix docs --open
 ```
 
 ## LICENSE

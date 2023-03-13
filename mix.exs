@@ -60,6 +60,11 @@ defmodule Mahaul.MixProject do
 
   defp aliases do
     [
+      setup: [
+        "deps.get",
+        "deps.compile",
+        "git_hooks.install"
+      ],
       "lint.code": [
         "format --check-formatted",
         "credo --strict"
