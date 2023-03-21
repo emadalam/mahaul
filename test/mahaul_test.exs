@@ -44,6 +44,7 @@ defmodule MahaulTest do
        [MOCK__ENV: [type: :str, default: 1000]]},
       {"MOCK__ENV: expected :default_dev to be a string, got: false",
        [MOCK__ENV: [type: :str, default_dev: false]]},
+      {"MOCK__ENV: expected :doc to be a string, got: []", [MOCK__ENV: [type: :str, doc: []]]},
       {"MOCK__ENV: unknown option provided {:invalid_option, \"__MOCK__\"}",
        [MOCK__ENV: [type: :str, invalid_option: "__MOCK__"]]}
     ]
@@ -362,6 +363,49 @@ defmodule MahaulTest do
       assert "__MOCK__VAL1__" = Env12.mock__env__str()
       assert "CUSTOM_VAL" = Env12.mock__env__new__str()
       assert "VAL1" = Env12.mock__env__new__str2()
+    end
+  end
+
+  describe "choices option" do
+    test "should warn for values not in choices list" do
+      defmodule Env.Choices1 do
+        use Mahaul,
+          MOCK__ENV__CHOICES: [type: :int, choices: [1, 2, 3, 4, 5, 6, 7]]
+      end
+
+      fun = fn ->
+        assert {:error, "MOCK__ENV__CHOICES"} = Env.Choices1.validate()
+      end
+
+      assert capture_log(fun) =~
+               "missing or invalid environment variables.\n" <>
+                 "MOCK__ENV__CHOICES"
+    end
+
+    test "should throw error for values not in choices list" do
+      defmodule Env.Choices2 do
+        use Mahaul,
+          MOCK__ENV__CHOICES: [type: :int, choices: [1, 2, 3, 4, 5, 6, 7]]
+      end
+
+      fun = fn ->
+        assert_raise RuntimeError, "Invalid environment variables!", fn ->
+          Env.Choices2.validate!()
+        end
+      end
+
+      assert capture_log(fun) =~
+               "missing or invalid environment variables.\n" <>
+                 "MOCK__ENV__CHOICES"
+    end
+
+    test "should return valid value from the list" do
+      defmodule Env.Choices3 do
+        use Mahaul,
+          MOCK__ENV__CHOICES: [type: :int, default: "7", choices: [1, 2, 3, 4, 5, 6, 7]]
+      end
+
+      assert 7 = Env.Choices3.mock__env__choices()
     end
   end
 end

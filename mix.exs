@@ -87,7 +87,8 @@ defmodule Mahaul.MixProject do
       source_url: @source_url,
       extras: [],
       groups_for_modules: [],
-      formatters: ["html"]
+      formatters: ["html"],
+      assets: "assets/"
     ]
   end
 
@@ -106,7 +107,8 @@ defmodule Mahaul.MixProject do
       licenses: ["MIT"],
       links: %{
         "GitHub" => @source_url
-      }
+      },
+      exclude_patterns: ["priv/plts/"]
     ]
   end
 end

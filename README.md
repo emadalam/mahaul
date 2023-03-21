@@ -11,6 +11,9 @@ Parse and validate your environment variables easily in Elixir with the followin
 * Parsed values with accurate elixir data types
 * Validation of required values before app boot
 * `mix` environment specific defaults and fallbacks
+* Code autocompletion (if using elixir language server)
+
+![Screenshot](assets/images/autocomplete.png)
 
 [Read more](#why-this-package) for understanding why to use this package and its benefits. The complete documentation for `mahaul` is [available online at HexDocs](https://hexdocs.pm/mahaul).
 
@@ -214,13 +217,52 @@ defmodule MyApp.Env do
 end
 ```
 
+## Setting documentation
+
+There is a default documentation added for each of the compile time generated function equivalents for the environment variables. However you may use the `doc` option to add a custom documentation with more details and explanations as per your needs.
+
+#### Default
+
+```elixir
+defmodule MyApp.Env do
+  use Mahaul,
+    PORT: [type: :port, defaults: [dev: "4000"]]
+end
+```
+![Documentation-default](assets/images/doc-default.png)
+
+#### Custom
+
+```elixir
+defmodule MyApp.Env do
+  use Mahaul,
+    PORT: [
+      type: :port,
+      defaults: [dev: "4000"],
+      doc: ~s"""
+      This is an example documentation for the environment variable.
+      We can use all the features from the elixir `@doc` tag that will
+      appear as the function documentation during its usage.
+
+      ## Usage
+
+          Env.port()
+
+      ## Notes
+      These are some notes to keep in mind.
+      """
+    ]
+end
+```
+![Documentation-custom](assets/images/doc-custom.png)
+
 ## Why this package
 
 `mahaul` accomplishes the following functionalities for streamlining the environment variables requirements for an elixir app.
 
 #### Compile time access guarantees
 
-Using the meta programming capabilities of Elixir, `mahaul` creates compile time methods for accessing the environment variables. This guarantees that there are no accidental typos during the access of the environment variables from the code.
+Using the meta programming capabilities of Elixir, `mahaul` creates compile time methods for accessing the environment variables. This guarantees that there are no accidental typos during the access of the environment variables from the code. Also as an added bonus, if you are using the [Elixir Language Server](https://github.com/elixir-lsp/elixir-ls) for your development environment, you'd get code autocompletion.
 
 #### Parsed values with accurate data types
 

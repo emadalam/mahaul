@@ -22,6 +22,12 @@ defmodule Mahaul do
         str_key = Atom.to_string(key)
         fn_name = str_key |> String.downcase() |> String.to_atom()
 
+        type = if Keyword.keyword?(val), do: val[:type]
+        doc = if Keyword.keyword?(val), do: val[:doc]
+
+        @doc if is_binary(doc),
+               do: doc,
+               else: "`#{key}` system environment variable value parsed as `:#{type}`."
         def unquote(fn_name)() do
           Helpers.get_env(unquote(key), unquote(val))
         end
