@@ -78,6 +78,13 @@ defmodule Mahaul.Configs do
     end)
   end
 
+  defp validate_opt!({:doc, doc}, name) do
+    unless is_binary(doc) do
+      raise ArgumentError,
+            "#{name}: expected :doc to be a string, got: #{inspect(doc)}"
+    end
+  end
+
   defp validate_opt!(option, name) do
     raise ArgumentError, "#{name}: unknown option provided #{inspect(option)}"
   end
