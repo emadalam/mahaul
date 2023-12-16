@@ -41,6 +41,13 @@ defmodule Mahaul.Configs do
     end
   end
 
+  defp validate_opt!({:base64, encoded?}, name) do
+    unless is_boolean(encoded?) do
+      raise ArgumentError,
+            "#{name}: expected :base64 to be a boolean, got: #{inspect(encoded?)}"
+    end
+  end
+
   defp validate_opt!({:choices, choices}, name) do
     unless is_list(choices) and not Enum.empty?(choices) do
       raise ArgumentError,
