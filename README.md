@@ -217,6 +217,23 @@ defmodule MyApp.Env do
 end
 ```
 
+## Setting custom function names
+
+You can use the `fun` option to use a custom function name instead of the default one.
+
+```elixir
+defmodule MyApp.Env do
+  use Mahaul,
+    MY_ENV: [type: :str, fun: :hello, default: "Hello World"]
+end
+```
+
+```
+iex -S mix
+iex> MyApp.Env.hello()
+Hello World
+```
+
 ## Setting documentation
 
 There is a default documentation added for each of the compile time generated function equivalents for the environment variables. However you may use the `doc` option to add a custom documentation with more details and explanations as per your needs.

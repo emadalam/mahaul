@@ -41,6 +41,13 @@ defmodule Mahaul.Configs do
     end
   end
 
+  defp validate_opt!({:fun, fun}, name) do
+    unless is_atom(fun) do
+      raise ArgumentError,
+            "#{name}: expected :fun to be an atom, got: #{inspect(fun)}"
+    end
+  end
+
   defp validate_opt!({:choices, choices}, name) do
     unless is_list(choices) and not Enum.empty?(choices) do
       raise ArgumentError,
