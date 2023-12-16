@@ -45,6 +45,8 @@ defmodule MahaulTest do
       {"MOCK__ENV: expected :default_dev to be a string, got: false",
        [MOCK__ENV: [type: :str, default_dev: false]]},
       {"MOCK__ENV: expected :doc to be a string, got: []", [MOCK__ENV: [type: :str, doc: []]]},
+      {"MOCK__ENV: expected :fun to be an atom, got: \"fun_name\"",
+       [MOCK__ENV: [type: :str, fun: "fun_name"]]},
       {"MOCK__ENV: unknown option provided {:invalid_option, \"__MOCK__\"}",
        [MOCK__ENV: [type: :str, invalid_option: "__MOCK__"]]}
     ]
@@ -406,6 +408,41 @@ defmodule MahaulTest do
       end
 
       assert 7 = Env.Choices3.mock__env__choices()
+    end
+  end
+
+  describe "fun option" do
+    test "should define a function with custom name" do
+      Config.Reader.read!("test/support/config/custom.exs")
+      |> Application.put_all_env()
+
+      defmodule Env.Fun1 do
+        use Mahaul,
+          MOCK__ENV__STR: [type: :str, fun: :custom_str],
+          MOCK__ENV__STR2: [
+            type: :str,
+            fun: :custom_str2,
+            default: "VAL1",
+            defaults: [custom: "CUSTOM_VAL"]
+          ],
+          MOCK__ENV__ENUM: [type: :enum, fun: :custom_enum],
+          MOCK__ENV__NUM: [type: :num, fun: :custom_num],
+          MOCK__ENV__INT: [type: :int, fun: :custom_int],
+          MOCK__ENV__BOOL: [type: :bool, fun: :custom_bool],
+          MOCK__ENV__PORT: [type: :port, fun: :custom_port],
+          MOCK__ENV__HOST: [type: :host, fun: :custom_host],
+          MOCK__ENV__URI: [type: :uri, fun: :custom_uri]
+      end
+
+      assert "__MOCK__VAL1__" == Env.Fun1.custom_str()
+      assert "CUSTOM_VAL" == Env.Fun1.custom_str2()
+      assert :__MOCK__VAL2__ = Env.Fun1.custom_enum()
+      assert 10.10 = Env.Fun1.custom_num()
+      assert 10 = Env.Fun1.custom_int()
+      assert true = Env.Fun1.custom_bool()
+      assert 8080 = Env.Fun1.custom_port()
+      assert "//example.com" = Env.Fun1.custom_host()
+      assert "https://example.com/something" = Env.Fun1.custom_uri()
     end
   end
 end

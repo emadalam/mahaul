@@ -20,7 +20,12 @@ defmodule Mahaul do
 
       Enum.each(opts, fn {key, val} ->
         str_key = Atom.to_string(key)
-        fn_name = str_key |> String.downcase() |> String.to_atom()
+        fn_name_default = str_key |> String.downcase() |> String.to_atom()
+
+        fn_name =
+          if Keyword.keyword?(val) && Keyword.get(val, :fun, "") |> is_atom(),
+            do: Keyword.get(val, :fun),
+            else: fn_name_default
 
         type = if Keyword.keyword?(val), do: val[:type]
         doc = if Keyword.keyword?(val), do: val[:doc]
