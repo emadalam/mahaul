@@ -12,7 +12,15 @@ defmodule MahaulTest do
     {"MOCK__ENV__BOOL", "true"},
     {"MOCK__ENV__PORT", "8080"},
     {"MOCK__ENV__HOST", "//example.com"},
-    {"MOCK__ENV__URI", "https://example.com/something"}
+    {"MOCK__ENV__URI", "https://example.com/something"},
+    {"MOCK__ENV__STR_ENCODED", Base.encode64("__MOCK__VAL1__")},
+    {"MOCK__ENV__ENUM_ENCODED", Base.encode64("__MOCK__VAL2__")},
+    {"MOCK__ENV__NUM_ENCODED", Base.encode64("10.10")},
+    {"MOCK__ENV__INT_ENCODED", Base.encode64("10")},
+    {"MOCK__ENV__BOOL_ENCODED", Base.encode64("true")},
+    {"MOCK__ENV__PORT_ENCODED", Base.encode64("8080")},
+    {"MOCK__ENV__HOST_ENCODED", Base.encode64("//example.com")},
+    {"MOCK__ENV__URI_ENCODED", Base.encode64("https://example.com/something")}
   ]
 
   setup do
@@ -31,6 +39,8 @@ defmodule MahaulTest do
       {"MOCK__ENV: expected options to be a non-empty keyword list, got: []", [MOCK__ENV: []]},
       {"MOCK__ENV: expected :type to be one of [:str, :enum, :num, :int, :bool, :port, :host, :uri], got: :invalid",
        [MOCK__ENV: [type: :invalid]]},
+      {"MOCK__ENV: expected :base64 to be a boolean, got: \"false\"",
+       [MOCK__ENV: [type: :str, base64: "false"]]},
       {"MOCK__ENV: missing required options [:type]", [MOCK__ENV: [default: "__MOCK__"]]},
       {"MOCK__ENV: expected :choices to be a non-empty list, got: true",
        [MOCK__ENV: [type: :str, choices: true]]},
@@ -95,6 +105,22 @@ defmodule MahaulTest do
       assert {:ok} = Env1.validate()
     end
 
+    test "should return success for valid encoded environment variables" do
+      defmodule Env1.Encoded do
+        use Mahaul,
+          MOCK__ENV__STR_ENCODED: [type: :str, base64: true],
+          MOCK__ENV__ENUM_ENCODED: [type: :enum, base64: true],
+          MOCK__ENV__NUM_ENCODED: [type: :num, base64: true],
+          MOCK__ENV__INT_ENCODED: [type: :int, base64: true],
+          MOCK__ENV__BOOL_ENCODED: [type: :bool, base64: true],
+          MOCK__ENV__PORT_ENCODED: [type: :port, base64: true],
+          MOCK__ENV__HOST_ENCODED: [type: :host, base64: true],
+          MOCK__ENV__URI_ENCODED: [type: :uri, base64: true]
+      end
+
+      assert {:ok} = Env1.Encoded.validate()
+    end
+
     test "should return error for all invalid environment variables" do
       defmodule Env2 do
         use Mahaul,
@@ -123,6 +149,40 @@ defmodule MahaulTest do
                  "MOCK__ENV__HOST\n" <>
                  "MOCK__ENV__URI"
     end
+
+    test "should return error for all invalid encoded environment variables" do
+      defmodule Env2.Encoded do
+        use Mahaul,
+          MOCK__ENV__MISSING_ENCODED: [type: :str, base64: true],
+          MOCK__ENV__NUM_ENCODED: [type: :int, base64: true],
+          MOCK__ENV__INT_ENCODED: [type: :bool, base64: true],
+          MOCK__ENV__BOOL_ENCODED: [type: :num, base64: true],
+          MOCK__ENV__PORT_ENCODED: [type: :host, base64: true],
+          MOCK__ENV__HOST_ENCODED: [type: :uri, base64: true],
+          MOCK__ENV__URI_ENCODED: [type: :int, base64: true]
+      end
+
+      fun = fn ->
+        assert {:error,
+                "MOCK__ENV__MISSING_ENCODED\n" <>
+                  "MOCK__ENV__NUM_ENCODED\n" <>
+                  "MOCK__ENV__INT_ENCODED\n" <>
+                  "MOCK__ENV__BOOL_ENCODED\n" <>
+                  "MOCK__ENV__PORT_ENCODED\n" <>
+                  "MOCK__ENV__HOST_ENCODED\n" <> "MOCK__ENV__URI_ENCODED"} =
+                 Env2.Encoded.validate()
+      end
+
+      assert capture_log(fun) =~
+               "missing or invalid environment variables.\n" <>
+                 "MOCK__ENV__MISSING_ENCODED\n" <>
+                 "MOCK__ENV__NUM_ENCODED\n" <>
+                 "MOCK__ENV__INT_ENCODED\n" <>
+                 "MOCK__ENV__BOOL_ENCODED\n" <>
+                 "MOCK__ENV__PORT_ENCODED\n" <>
+                 "MOCK__ENV__HOST_ENCODED\n" <>
+                 "MOCK__ENV__URI_ENCODED"
+    end
   end
 
   describe "validate!/0" do
@@ -141,6 +201,26 @@ defmodule MahaulTest do
 
       fun = fn ->
         assert :ok = Env3.validate!()
+      end
+
+      capture_log(fun)
+    end
+
+    test "should not raise exception for valid encoded environment variables" do
+      defmodule Env3.Encoded do
+        use Mahaul,
+          MOCK__ENV__STR_ENCODED: [type: :str, base64: true],
+          MOCK__ENV__ENUM_ENCODED: [type: :enum, base64: true],
+          MOCK__ENV__NUM_ENCODED: [type: :num, base64: true],
+          MOCK__ENV__INT_ENCODED: [type: :int, base64: true],
+          MOCK__ENV__BOOL_ENCODED: [type: :bool, base64: true],
+          MOCK__ENV__PORT_ENCODED: [type: :port, base64: true],
+          MOCK__ENV__HOST_ENCODED: [type: :host, base64: true],
+          MOCK__ENV__URI_ENCODED: [type: :uri, base64: true]
+      end
+
+      fun = fn ->
+        assert :ok = Env3.Encoded.validate!()
       end
 
       capture_log(fun)
@@ -174,6 +254,35 @@ defmodule MahaulTest do
                  "MOCK__ENV__HOST\n" <>
                  "MOCK__ENV__URI"
     end
+
+    test "should raise exception for invalid encoded environment variables" do
+      defmodule Env4.Encoded do
+        use Mahaul,
+          MOCK__ENV__MISSING_ENCODED: [type: :str, base64: true],
+          MOCK__ENV__NUM_ENCODED: [type: :int, base64: true],
+          MOCK__ENV__INT_ENCODED: [type: :bool, base64: true],
+          MOCK__ENV__BOOL_ENCODED: [type: :num, base64: true],
+          MOCK__ENV__PORT_ENCODED: [type: :host, base64: true],
+          MOCK__ENV__HOST_ENCODED: [type: :uri, base64: true],
+          MOCK__ENV__URI_ENCODED: [type: :int, base64: true]
+      end
+
+      fun = fn ->
+        assert_raise RuntimeError, "Invalid environment variables!", fn ->
+          Env4.Encoded.validate!()
+        end
+      end
+
+      assert capture_log(fun) =~
+               "missing or invalid environment variables.\n" <>
+                 "MOCK__ENV__MISSING_ENCODED\n" <>
+                 "MOCK__ENV__NUM_ENCODED\n" <>
+                 "MOCK__ENV__INT_ENCODED\n" <>
+                 "MOCK__ENV__BOOL_ENCODED\n" <>
+                 "MOCK__ENV__PORT_ENCODED\n" <>
+                 "MOCK__ENV__HOST_ENCODED\n" <>
+                 "MOCK__ENV__URI_ENCODED"
+    end
   end
 
   describe "accessing environment variables" do
@@ -198,6 +307,29 @@ defmodule MahaulTest do
       assert 8080 = Env5.mock__env__port()
       assert "//example.com" = Env5.mock__env__host()
       assert "https://example.com/something" = Env5.mock__env__uri()
+    end
+
+    test "should work when encoded" do
+      defmodule Env5.Encoded do
+        use Mahaul,
+          MOCK__ENV__STR_ENCODED: [type: :str, base64: true],
+          MOCK__ENV__ENUM_ENCODED: [type: :enum, base64: true],
+          MOCK__ENV__NUM_ENCODED: [type: :num, base64: true],
+          MOCK__ENV__INT_ENCODED: [type: :int, base64: true],
+          MOCK__ENV__BOOL_ENCODED: [type: :bool, base64: true],
+          MOCK__ENV__PORT_ENCODED: [type: :port, base64: true],
+          MOCK__ENV__HOST_ENCODED: [type: :host, base64: true],
+          MOCK__ENV__URI_ENCODED: [type: :uri, base64: true]
+      end
+
+      assert "__MOCK__VAL1__" = Env5.Encoded.mock__env__str_encoded()
+      assert :__MOCK__VAL2__ = Env5.Encoded.mock__env__enum_encoded()
+      assert 10.10 = Env5.Encoded.mock__env__num_encoded()
+      assert 10 = Env5.Encoded.mock__env__int_encoded()
+      assert true = Env5.Encoded.mock__env__bool_encoded()
+      assert 8080 = Env5.Encoded.mock__env__port_encoded()
+      assert "//example.com" = Env5.Encoded.mock__env__host_encoded()
+      assert "https://example.com/something" = Env5.Encoded.mock__env__uri_encoded()
     end
 
     test "should return default values" do

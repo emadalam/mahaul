@@ -217,6 +217,17 @@ defmodule MyApp.Env do
 end
 ```
 
+## Base64 Encoding
+
+Base64-encoded values can be read by setting the `base64` option to `true`.
+
+```elixir
+defmodule MyApp.Env do
+  use Mahaul,
+    ENCODED_STR: [type: :str, base64: true]
+end
+```
+
 ## Setting documentation
 
 There is a default documentation added for each of the compile time generated function equivalents for the environment variables. However you may use the `doc` option to add a custom documentation with more details and explanations as per your needs.

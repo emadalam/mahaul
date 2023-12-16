@@ -49,12 +49,38 @@ defmodule Mahaul.Env do
   def get_env(key, config) do
     env_name = Atom.to_string(key)
     env_type = Keyword.get(config, :type)
-    env_val = System.get_env(env_name) |> get_env_val_or_default(config)
 
-    if is_nil(env_val), do: @error_tuple, else: Parser.parse(env_val, env_type)
+    env_val =
+      System.get_env(env_name)
+      |> maybe_decode(config)
+      |> get_env_val_or_default(config)
+
+    cond do
+      env_val == @error_tuple -> @error_tuple
+      is_nil(env_val) -> @error_tuple
+      true -> Parser.parse(env_val, env_type)
+    end
   end
 
-  defp get_env_val_or_default(env_val, config, mix_env \\ Constants.mix_env()) do
+  defp maybe_decode(env_val, config) when is_binary(env_val) do
+    decode? = Keyword.get(config, :base64, false)
+
+    if decode? do
+      case Base.decode64(env_val) do
+        {:ok, decoded} -> decoded
+        :error -> @error_tuple
+      end
+    else
+      env_val
+    end
+  end
+
+  defp maybe_decode(nil, _config), do: nil
+
+  defp get_env_val_or_default(env_val, config, mix_env \\ Constants.mix_env())
+  defp get_env_val_or_default(@error_tuple, _config, _mix_env), do: @error_tuple
+
+  defp get_env_val_or_default(env_val, config, mix_env) do
     # simplify this once we remove support for `:default_dev` option
     # in favour of the `:defaults` option
     if Keyword.has_key?(config, :default_dev) do
